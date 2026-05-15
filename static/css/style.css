@@ -1,0 +1,270 @@
+:root {
+  --green-dark: #1b4332;
+  --green-mid: #2d6a4f;
+  --green-main: #40916c;
+  --green-light: #74c69d;
+  --green-pale: #d8f3dc;
+  --orange: #f4a261;
+  --orange-dark: #e76f51;
+  --bg: #f0f7f1;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --muted: #6c757d;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+  background: var(--green-dark);
+  padding: 14px 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.navbar .brand {
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.navbar .subtitle {
+  color: var(--green-light);
+  font-size: 0.85rem;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 40px 0 20px;
+}
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--green-dark);
+}
+.hero p {
+  font-size: 1.1rem;
+  color: var(--muted);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+}
+.card-header {
+  border-radius: var(--radius) var(--radius) 0 0 !important;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+  font-weight: 600;
+}
+
+/* Drop zone */
+.drop-zone {
+  border: 2.5px dashed var(--green-light);
+  border-radius: var(--radius);
+  padding: 60px 30px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: var(--green-pale);
+}
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--green-main);
+  background: #c7f0d4;
+  transform: scale(1.01);
+}
+.drop-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+.drop-zone h5 { color: var(--green-dark); font-weight: 700; }
+.drop-zone p  { color: var(--muted); margin-bottom: 20px; }
+
+/* Buttons */
+.btn-green {
+  background: var(--green-main);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-green:hover {
+  background: var(--green-dark);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.btn-green:active { transform: translateY(0); }
+
+/* Preview image */
+#previewImage {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  max-height: 280px;
+  object-fit: cover;
+}
+
+/* Loading spinner */
+.loading-wrap {
+  padding: 60px 0;
+  text-align: center;
+}
+.spinner-ring {
+  display: inline-block;
+  width: 56px;
+  height: 56px;
+  border: 5px solid var(--green-pale);
+  border-top-color: var(--green-main);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+  margin-bottom: 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Result header */
+.result-header-healthy { background: linear-gradient(135deg, var(--green-mid), var(--green-main)); color: #fff; }
+.result-header-disease  { background: linear-gradient(135deg, #c77b2c, var(--orange)); color: #fff; }
+.result-header-healthy h5,
+.result-header-disease h5 { color: #fff; }
+
+/* Plant icon circle */
+.plant-icon-wrap {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  margin: 0 auto 10px;
+}
+.plant-icon-healthy { background: var(--green-pale); }
+.plant-icon-disease  { background: #fde8d8; }
+
+/* Status badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.badge-healthy { background: #d1fae5; color: #065f46; }
+.badge-disease  { background: #fed7aa; color: #7c2d12; }
+
+/* Confidence bar */
+.conf-track {
+  height: 12px;
+  background: #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.conf-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease;
+}
+.conf-fill-healthy { background: linear-gradient(90deg, var(--green-light), var(--green-main)); }
+.conf-fill-disease  { background: linear-gradient(90deg, #fbbf24, var(--orange)); }
+
+/* Top-5 bars */
+.pred-bar-track {
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.pred-bar-fill-healthy { background: var(--green-light); }
+.pred-bar-fill-disease  { background: var(--orange); }
+.pred-row { margin-bottom: 14px; }
+.pred-row:last-child { margin-bottom: 0; }
+.pred-label { font-size: 0.88rem; }
+.pred-label.top1 { font-weight: 700; color: var(--green-dark); }
+
+/* Supported plants grid */
+.plant-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-pale);
+  color: var(--green-dark);
+  border-radius: 50px;
+  padding: 5px 14px;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* Error alert */
+.alert-plant-error {
+  border-left: 4px solid var(--orange-dark);
+  background: #fff5f0;
+  color: #7c2d12;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+}
+
+/* Unknown plant alert */
+.alert-plant-unknown {
+  border-left: 4px solid #6c757d;
+  background: #f8f9fa;
+  color: #343a40;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+}
+
+/* Model-not-loaded banner */
+.no-model-banner {
+  background: #fff8e1;
+  border: 1px solid #ffc107;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.no-model-banner .icon { font-size: 1.4rem; flex-shrink: 0; }
+.no-model-banner code {
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.88rem;
+}
+
+/* Footer */
+footer {
+  background: var(--green-dark);
+  color: var(--green-light);
+  text-align: center;
+  padding: 18px;
+  font-size: 0.82rem;
+  margin-top: 60px;
+}
+
+/* Utilities */
+.d-none { display: none !important; }
+.text-green { color: var(--green-main); }
