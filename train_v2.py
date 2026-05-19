@@ -1,18 +1,4 @@
-"""
-train_v2.py
-Entrenamiento multi-dataset con curriculum learning para clasificación de enfermedades en plantas.
 
-Estrategia:
-  Fase 1 — Dataset limpio (New Plant Diseases), base congelada, augmentación leve
-  Fase 2 — Dataset mixto (limpio + mundo real), descongelamiento parcial, augmentación intensa
-  Fase 3 — Solo mundo real (PlantSeg + PlantDEC), descongelamiento profundo, augmentación extrema
-
-Uso:
-    python train_v2.py                                       # descarga automática de datasets
-    python train_v2.py --backbone efficientnet               # usar EfficientNetB0
-    python train_v2.py --dataset_npd <ruta>                  # usar dataset NPD local
-    python train_v2.py --batch_size 16 --phase1_epochs 15    # configuración personalizada
-"""
 
 import os
 import sys
