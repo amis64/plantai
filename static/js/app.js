@@ -1,37 +1,28 @@
 'use strict';
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Datos ─────────────────────────────────────────────────────────────────────
 
 const PLANT_EMOJIS = {
-  'Manzana': '🍎', 'Arándano': '🫐', 'Cereza': '🍒',
-  'Maíz': '🌽', 'Uva': '🍇', 'Naranja': '🍊',
-  'Durazno': '🍑', 'Pimiento': '🌶️', 'Papa': '🥔',
-  'Frambuesa': '🍓', 'Soya': '🌱', 'Calabaza': '🎃',
-  'Fresa': '🍓', 'Tomate': '🍅',
+  'Manzana':   '🍎', 'Arándano':  '🫐', 'Cereza':    '🍒',
+  'Maíz':      '🌽', 'Uva':       '🍇', 'Naranja':   '🍊',
+  'Durazno':   '🍑', 'Pimiento':  '🌶️', 'Papa':      '🥔',
+  'Frambuesa': '🍓', 'Soya':      '🌱', 'Calabaza':  '🎃',
+  'Fresa':     '🍓', 'Tomate':    '🍅', 'Banana':    '🍌',
+  'Albahaca':  '🌿', 'Frijol':    '🫘', 'Brócoli':   '🥦',
+  'Col':       '🥬', 'Zanahoria': '🥕', 'Coliflor':  '🥦',
+  'Apio':      '🌿', 'Café':      '☕', 'Pepino':    '🥒',
+  'Berenjena': '🍆', 'Ajo':       '🧄', 'Lechuga':   '🥬',
+  'Arce':      '🍁', 'Ciruela':   '🫐', 'Arroz':     '🌾',
+  'Tabaco':    '🌿', 'Trigo':     '🌾', 'Calabacín': '🥒',
 };
 
-const SUPPORTED_PLANTS = [
-  { name: 'Manzana',   diseases: 4 },
-  { name: 'Arándano',  diseases: 1 },
-  { name: 'Cereza',    diseases: 2 },
-  { name: 'Maíz',      diseases: 4 },
-  { name: 'Uva',       diseases: 4 },
-  { name: 'Naranja',   diseases: 1 },
-  { name: 'Durazno',   diseases: 2 },
-  { name: 'Pimiento',  diseases: 2 },
-  { name: 'Papa',      diseases: 3 },
-  { name: 'Frambuesa', diseases: 1 },
-  { name: 'Soya',      diseases: 1 },
-  { name: 'Calabaza',  diseases: 1 },
-  { name: 'Fresa',     diseases: 2 },
-  { name: 'Tomate',    diseases: 10 },
-];
+// ── Estado ────────────────────────────────────────────────────────────────────
 
-// ── State ─────────────────────────────────────────────────────────────────────
+let currentFile   = null;
+let currentMode   = 'auto';   // 'auto' | 'plant'
+let selectedPlant = null;
 
-let currentFile = null;
-
-// ── DOM helpers ───────────────────────────────────────────────────────────────
+// ── Utilidades DOM ────────────────────────────────────────────────────────────
 
 const $ = id => document.getElementById(id);
 
@@ -42,27 +33,73 @@ function showOnly(id) {
   show(id);
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// ── Inicialización ────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
   setupDropZone();
   setupFileInput();
-  renderPlantsGrid();
   checkModelHealth();
+  loadPlants();
   showOnly('uploadCard');
 });
 
-// ── Model health check ────────────────────────────────────────────────────────
+// ── Verificación de estado del modelo ─────────────────────────────────────────
 
 async function checkModelHealth() {
   try {
     const res = await fetch('/health');
     const data = await res.json();
     if (!data.model_loaded) show('noModelBanner');
-  } catch (_) { /* server may not be ready yet */ }
+  } catch (_) { /* el servidor puede no estar listo aún */ }
 }
 
-// ── Drop zone ─────────────────────────────────────────────────────────────────
+// ── Selector de modo ──────────────────────────────────────────────────────────
+
+function setMode(mode) {
+  currentMode = mode;
+  selectedPlant = null;
+
+  $('btnAutoMode').classList.toggle('active', mode === 'auto');
+  $('btnPlantMode').classList.toggle('active', mode === 'plant');
+
+  if (mode === 'plant') {
+    show('plantSelectorCard');
+  } else {
+    hide('plantSelectorCard');
+  }
+
+  // Limpiar cualquier chip seleccionado activo
+  document.querySelectorAll('.plant-chip-pick').forEach(el => el.classList.remove('selected'));
+}
+
+// ── Selector de planta ────────────────────────────────────────────────────────
+
+async function loadPlants() {
+  try {
+    const res  = await fetch('/classes');
+    const data = await res.json();
+    renderPlantPicker(data.plants);
+  } catch (_) { /* servidor no disponible aún — el modo guiado estará vacío hasta la próxima carga */ }
+}
+
+function renderPlantPicker(plants) {
+  const grid = $('plantPickerGrid');
+  if (!grid) return;
+  grid.innerHTML = plants.map(p => {
+    const emoji = PLANT_EMOJIS[p.name] || '🌿';
+    return `<span class="plant-chip-pick" onclick="selectPlant('${p.name.replace(/'/g, "\\'")}', this)">
+      ${emoji} ${p.name}
+    </span>`;
+  }).join('');
+}
+
+function selectPlant(name, el) {
+  selectedPlant = name;
+  document.querySelectorAll('.plant-chip-pick').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+}
+
+// ── Zona de arrastre ──────────────────────────────────────────────────────────
 
 function setupDropZone() {
   const zone = $('dropZone');
@@ -90,7 +127,7 @@ function setupFileInput() {
   });
 }
 
-// ── File handling ─────────────────────────────────────────────────────────────
+// ── Manejo de archivos ────────────────────────────────────────────────────────
 
 function handleFile(file) {
   const allowed = ['image/jpeg', 'image/png', 'image/webp'];
@@ -121,7 +158,7 @@ function formatBytes(bytes) {
   return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
-// ── Analysis ──────────────────────────────────────────────────────────────────
+// ── Análisis ──────────────────────────────────────────────────────────────────
 
 async function analyzeImage() {
   if (!currentFile) return;
@@ -131,6 +168,9 @@ async function analyzeImage() {
 
   const formData = new FormData();
   formData.append('image', currentFile);
+  if (currentMode === 'plant' && selectedPlant) {
+    formData.append('plant', selectedPlant);
+  }
 
   try {
     const res = await fetch('/predict', { method: 'POST', body: formData });
@@ -152,32 +192,38 @@ async function analyzeImage() {
   }
 }
 
-// ── Results ───────────────────────────────────────────────────────────────────
+// ── Resultados ────────────────────────────────────────────────────────────────
 
 function displayResults(data) {
   const { plant, disease, description, is_healthy: healthy, confidence, top5 } = data;
 
-  // Header color
+  // Badge de modo guiado
+  const guidedBadgeEl = $('guidedBadge');
+  if (guidedBadgeEl) {
+    guidedBadgeEl.classList.toggle('d-none', !(currentMode === 'plant' && selectedPlant));
+  }
+
+  // Color de la cabecera
   const header = $('resultCardHeader');
   header.className = 'card-header ' + (healthy ? 'result-header-healthy' : 'result-header-disease');
 
-  // Icon
+  // Ícono
   const iconWrap = $('plantIconWrap');
   iconWrap.className = 'plant-icon-wrap ' + (healthy ? 'plant-icon-healthy' : 'plant-icon-disease');
   $('plantIcon').textContent = getEmoji(plant);
 
-  // Badge
+  // Badge de estado
   const badge = $('statusBadge');
   badge.textContent = healthy ? '✅ Saludable' : '⚠️ Enfermedad detectada';
   badge.className = 'status-badge ' + (healthy ? 'badge-healthy' : 'badge-disease');
 
-  // Text
+  // Texto
   $('plantName').textContent = plant;
   $('diseaseName').textContent = disease;
   const descEl = $('diseaseDescription');
   if (descEl) descEl.textContent = description || '';
 
-  // Confidence
+  // Confianza
   const pct = (confidence * 100).toFixed(1);
   $('confidenceText').textContent = pct + '%';
   const fill = $('confidenceFill');
@@ -185,7 +231,7 @@ function displayResults(data) {
   fill.style.width = '0%';
   setTimeout(() => { fill.style.width = pct + '%'; }, 80);
 
-  // Top 5
+  // Top 5 predicciones
   const container = $('top5Container');
   container.innerHTML = top5.map((pred, i) => {
     const p = (pred.confidence * 100).toFixed(1);
@@ -209,7 +255,7 @@ function displayResults(data) {
   $('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ── Reset ─────────────────────────────────────────────────────────────────────
+// ── Restablecer ───────────────────────────────────────────────────────────────
 
 function resetUpload() {
   currentFile = null;
@@ -218,7 +264,7 @@ function resetUpload() {
   showOnly('uploadCard');
 }
 
-// ── Error / Unknown ───────────────────────────────────────────────────────────
+// ── Error / Planta desconocida ────────────────────────────────────────────────
 
 function showError(msg) {
   $('errorMessage').textContent = msg;
@@ -235,23 +281,7 @@ function showUnknown(msg, confidence) {
   show('uploadCard');
 }
 
-// ── Plants grid ───────────────────────────────────────────────────────────────
-
-function renderPlantsGrid() {
-  const grid = $('plantsGrid');
-  if (!grid) return;
-  grid.innerHTML = SUPPORTED_PLANTS.map(p => `
-    <div class="col-6 col-md-4 col-lg-3 mb-2">
-      <div class="plant-chip">
-        <span>${getEmoji(p.name)}</span>
-        <span>${p.name}</span>
-        <small class="text-muted">(${p.diseases})</small>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Auxiliares ────────────────────────────────────────────────────────────────
 
 function getEmoji(plantName) {
   return PLANT_EMOJIS[plantName] || '🌿';
